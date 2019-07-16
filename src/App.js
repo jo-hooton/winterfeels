@@ -1,26 +1,50 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import CharacterList from './CharacterList';
 
-function App() {
+class App extends React.Component {
+
+  state = {
+    characters: [],
+    likedCharacters: [],
+    selectedCharacter: null
+  }
+
+  fetchWinterfell = () => {
+    const url = 'https://anapioficeandfire.com/api/houses/362'
+    fetch(url)
+      .then(resp => resp.json())
+      .then(characters => this.fetchCharacter(characters))
+  }
+
+  fetchCharacter = characters => {
+    characters.swornMembers.forEach(member => {
+      fetch(member)
+      .then(resp => resp.json())
+      .then(character => this.setCharacter(character))
+    })
+  }
+
+  setCharacter = character => {
+    const characterArray = this.state.characters
+    characterArray.push(character)
+    this.setState({ characters: characterArray })
+  }
+
+  componentDidMount = () => {
+    this.fetchWinterfell()
+  }
+
+  render() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <CharacterList characters={this.state.characters} />
       </header>
+      
     </div>
   );
+  }
 }
 
 export default App;
